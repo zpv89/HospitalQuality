@@ -35,29 +35,31 @@ rankhospital <- function(state,outcome,num="best"){
   ## Get the required state data
   get_state_data=subset(df_clean, State==state)
   
-  ranking <- rank(get_state_data[,3],na.last = TRUE)
-  ranked <- order(get_state_data[,3],na.last = TRUE)
+  ##ranking <- rank(get_state_data[,3],na.last = TRUE,ties.method = "min")
+  ranking <- c(1:nrow(get_state_data))
+  ranked <- order(get_state_data[,3],get_state_data$Hospital.Name)
   
-  final <- data.frame(get_state_data$Hospital.Name,get_state_data[,3],ranked)
+  final <- data.frame(get_state_data[ranked,1],get_state_data[ranked,3],ranking)
   colnames(final)[1]<-"Hospital.Name"
   colnames(final)[2]<- "Rate"
   colnames(final)[3]<- "Ranking"
   final[, 2]<-as.numeric(final[, 2])
   final[,3]<-as.integer(final[,3])
   
-  
-  if (num == "best"){
-    hospital <- which.min(ranking)
-    best <- final[hospital,1]
-    print(as.character(best))
-  } else if (num == "Worst"){
-    hospital <- which.max(ranking)
-    worst <- final[hospital,1]
-    print(as.character(worst))
-  } else {
-    output <- final[num,]
-    print(as.character(output))
-  }
+  if (class(num)=="character"){
+    if (num == "best"){
+      hospital <- which.min(ranking)
+      best <- final[hospital,1]
+      print(as.character(best))
+    } else {
+      hospital <- which.max(ranking)
+      worst <- final[hospital,1]
+      print(as.character(worst))
+  }} else {
+      hospital <- match(num,ranking)
+      output <- final[hospital,1]
+      print(as.character(output))
+    }
   
   
 }
